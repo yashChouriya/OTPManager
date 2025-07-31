@@ -147,7 +147,7 @@ project/
 │
 ├── otp_manager.py         # Contains OTPManager class
 ├── payload_pb2.py         # Generated protobuf schema
-├── main.py                # Example usage
+├── usage.py                # Example usage
 └── README.md
 ```
 
