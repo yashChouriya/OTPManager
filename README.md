@@ -18,7 +18,6 @@ A lightweight Python utility to import, manage, and generate **TOTP (Time-based 
 
 - Python 3.7+
 - `protobuf==5.28.0`
-- `topgen` (for its `payload_pb2.py`, or generate your own)
 
 Install dependencies:
 
@@ -30,7 +29,7 @@ pip install protobuf==5.28.0
 
 ## 📁 Setup
 
-You need the `payload_pb2.py` file from `topgen` or generated using the `payload.proto` schema.
+You need the `payload_pb2.py` file using the `payload.proto` schema.
 
 Place `payload_pb2.py` in the same directory as your script.
 
@@ -87,8 +86,6 @@ for label, otp in codes.items():
 ---
 
 ## 🛠️ Generating `payload_pb2.py` (Optional)
-
-If not using `topgen`, compile `payload.proto` yourself:
 
 1. Install protoc 5.28.0
 
