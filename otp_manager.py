@@ -83,3 +83,69 @@ class OTPManager:
             f"{p.issuer} ({p.name})": self._generate_totp(p.secret, counter)
             for p in self.payload.otp_parameters
         }
+
+    def get_current_otps_with_remaining(self):
+        now = time.time()
+        counter = int(now // INTERVAL)
+        seconds_remaining = INTERVAL - (int(now) % INTERVAL)
+
+        return {
+            f"{p.issuer} ({p.name})": {
+                "otp": self._generate_totp(p.secret, counter),
+                "expires_in": seconds_remaining,
+            }
+            for p in self.payload.otp_parameters
+        }
+
+    def get_otps_with_min_remaining(self, min_remaining: int = 25, block: bool = True):
+        """
+        Return current OTPs. If fewer than `min_remaining` seconds remain in this
+        30s window and `block` is True, wait until the next window so the returned
+        codes have ~30s remaining.
+
+        Returns: { "issuer (name)": {"otp": "123456", "expires_in": int} }
+        """
+        period = INTERVAL
+        now = time.time()
+        remaining = period - (now % period)
+
+        if remaining < min_remaining and block:
+            # Sleep just past the boundary so we enter the next TOTP window.
+            time.sleep(remaining + 0.05)
+
+        now = time.time()
+        counter = int(now // period)
+        seconds_remaining = int(period - (now % period))
+
+        return [
+            {
+                "issuer": p.issuer,
+                "otp": self._generate_totp(p.secret, counter),
+                "expires_in": seconds_remaining,
+            }
+            for p in self.payload.otp_parameters
+        ]
+
+    def get_next_fresh_otps(self):
+        """
+        Always wait for the next 30s boundary and return brand-new OTPs with
+        ~30 seconds remaining.
+
+        Returns: { "issuer (name)": {"otp": "123456", "expires_in": 30} }
+        """
+        period = INTERVAL
+        # Sleep to the very start of the next period
+        sleep_for = period - (time.time() % period)
+        time.sleep(sleep_for + 0.05)  # small epsilon to cross the boundary
+
+        now = time.time()
+        counter = int(now // period)
+        seconds_remaining = int(period - (now % period))
+
+        return {
+            f"{p.issuer} ({p.name})": {
+                "otp": self._generate_totp(p.secret, counter),
+                "expires_in": seconds_remaining,
+            }
+            for p in self.payload.otp_parameters
+        }
