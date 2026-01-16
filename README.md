@@ -156,7 +156,3 @@ project/
 ## 📄 License
 
 MIT License – use freely, modify responsibly.
-
----
-
-Let me know if you'd like this converted into a full Python package or published to PyPI!
